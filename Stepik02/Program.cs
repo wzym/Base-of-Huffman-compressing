@@ -10,28 +10,36 @@ namespace Stepik02
         {
             var stringToEncode = Console.ReadLine();
             if (string.IsNullOrEmpty(stringToEncode)) return;
-            var frequencies = CountAndGetFrequencies(stringToEncode);
             
-            var myHeap = new MyBinMinHeap(26);
-            foreach (var charFrequency in frequencies)
-                myHeap.Add(new CharFreq(charFrequency.Key, charFrequency.Value));
-
-            while (myHeap.Count > 1)
-            {
-                var curMin = myHeap.GetMin();
-                var curMax = myHeap.GetMin();
-                var newParent = new CharFreq('Ё', curMin.Frequency + curMax.Frequency)
-                {
-                    LeftChild = curMin, RightChild = curMax
-                };
-                myHeap.Add(newParent);
-            }
-
-            var newRoot = myHeap.GetMin();
+            var frequencies = CountAndGetFrequencies(stringToEncode);
             var codes = new Dictionary<char, string>();
+            if (frequencies.Count == 1)
+            {
+                codes.Add(stringToEncode[0], "0");
+            }
+            else
+            {
+                var myHeap = new MyBinMinHeap(26);
+                foreach (var charFrequency in frequencies)
+                    myHeap.Add(new CharFreq(charFrequency.Key, charFrequency.Value));
 
-            CollectAllCodes(newRoot, "", codes);
 
+                while (myHeap.Count > 1)
+                {
+                    var curMin = myHeap.GetMin();
+                    var curMax = myHeap.GetMin();
+                    var newParent = new CharFreq('Ё', curMin.Frequency + curMax.Frequency)
+                    {
+                        LeftChild = curMin, RightChild = curMax
+                    };
+                    myHeap.Add(newParent);
+                }
+
+                var newRoot = myHeap.GetMin();
+
+                CollectAllCodes(newRoot, "", codes);
+            }
+            
             var encoded = Encode(stringToEncode, codes);
             PrintResult(codes, encoded);
         }
